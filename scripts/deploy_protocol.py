@@ -7,6 +7,7 @@ from brownie.network.state import _add_contract, _remove_contract
 import shared
 from munch import Munch
 
+### true 表示从新部署的意思
 deploys = Munch.fromDict({
     "bZxProtocol": True,
     "PriceFeeds": True,
@@ -53,7 +54,7 @@ def deployProtocol():
         tokens.link = Contract.from_abi("LINK", address=addresses.kovan.LINKTokenAddress, abi=IWethERC20.abi, owner=acct)'''
 
     ### DEPLOYMENT START ###
-
+    ### true
     if deploys.bZxProtocol is True:
         print("Deploying bZxProtocol.")
         bzxproxy = acct.deploy(bZxProtocol)
@@ -90,7 +91,8 @@ def deployProtocol():
             )
         else:
             if thisNetwork == "kovan":
-                '''feeds = acct.deploy(PriceFeedsLocal)
+                feeds = acct.deploy(PriceFeedsLocal)
+                ### feeds = acct.deploy(PriceFeeds) //主网环境
 
                 print("Calling setRates x3.")
                 feeds.setRates(
@@ -109,8 +111,8 @@ def deployProtocol():
                     "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470", # WETH
                     30.283297741653263000e18
                 )
-                '''
 
+                '''
                 feeds = acct.deploy(PriceFeedsLocal)
 
                 feedsOld = Contract.from_abi("feeds", bzx.priceFeeds(), abi=PriceFeedsLocal.abi, owner=acct)
@@ -131,6 +133,7 @@ def deployProtocol():
                     "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470", # WETH
                     feedsOld.rates("0x5aE55494Ccda82f1F7c653BC2b6EbB4aD3C77Dac", "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470")
                 )
+                '''
 
                 print("Calling setDecimals.")
                 feeds.setDecimals(
@@ -142,6 +145,7 @@ def deployProtocol():
                         "0x6F8304039f34fd6A6acDd511988DCf5f62128a32"  # vBZRX
                     ]
                 )
+
             elif thisNetwork == "mainnet":
                 feeds = acct.deploy(PriceFeeds)
                 #feeds = Contract.from_abi("feeds", address=bzx.priceFeeds(), abi=PriceFeeds.abi, owner=acct)
@@ -236,7 +240,7 @@ def deployProtocol():
         if thisNetwork == "development":
             swaps = acct.deploy(SwapsImplTestnets)
         elif thisNetwork == "kovan":
-            swaps = acct.deploy(SwapsImplTestnets)
+            swaps = acct.deploy(SwapsImplKyber)
         else:
             swaps = acct.deploy(SwapsImplKyber)
 
@@ -267,7 +271,7 @@ def deployProtocol():
             bzx.setMaxSwapSize(0)
 
             #swaps = Contract.from_abi("swaps", bzx.swapsImpl(), abi=SwapsImplTestnets.abi, owner=acct)
-            swaps.setLocalPriceFeedContract(bzx.priceFeeds())
+            ### swaps.setLocalPriceFeedContract(bzx.priceFeeds()) SwapsImplKyber 中没有本地喂价的设定
 
             print("Calling setLoanPool.")
             bzx.setLoanPool(
@@ -283,23 +287,23 @@ def deployProtocol():
                 ]
             )
 
-            print("Calling setSupportedTokens.")
-            bzx.setSupportedTokens(
-                [
-                    "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470", # WETH
-                    "0xB443f30CDd6076b1A5269dbc08b774F222d4Db4e", # USDC
-                    "0xB54Fc2F2ea17d798Ad5C7Aba2491055BCeb7C6b2", # BZRX
-                    "0x5aE55494Ccda82f1F7c653BC2b6EbB4aD3C77Dac", # WBTC
-                    "0x6F8304039f34fd6A6acDd511988DCf5f62128a32"  # vBZRX
-                ],
-                [
-                    True,
-                    True,
-                    True,
-                    True,
-                    True
-                ]
-            )
+            # ====================================
+            # print("Calling setSupportedTokens.")
+            # ### ？？？
+            # bzx.setSupportedTokens(
+            #     [
+            #         "0xfBE16bA4e8029B759D3c5ef8844124893f3ae470", # WETH
+            #         "0xB443f30CDd6076b1A5269dbc08b774F222d4Db4e", # USDC
+            #         "0xB54Fc2F2ea17d798Ad5C7Aba2491055BCeb7C6b2", # BZRX
+            #         "0x5aE55494Ccda82f1F7c653BC2b6EbB4aD3C77Dac", # WBTC
+            #     ],
+            #     [
+            #         True,
+            #         True,
+            #         True,
+            #         True
+            #     ]
+            # )
 
             ## 7e18 = 5% collateral discount
             # handled in setup_pool_params2

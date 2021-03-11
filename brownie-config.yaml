@@ -17,7 +17,7 @@ networks:
         reverting_tx_gas_limit: 8000000
         default_contract_owner: true
         cmd_settings:
-            port: 8555
+            port: 7545
             gas_limit: 8000000
             accounts: 10
             evm_version: istanbul
@@ -25,6 +25,7 @@ networks:
             block_time: 0
             default_balance: 100
             #time: 2020-05-08T14:54:08+0000
+            unlock: 0xED36A54b191870B4D582D65a2902CA89DE219908
     live:
         gas_limit: 8000000
         gas_price: 1000000000 # 8000000000
@@ -32,7 +33,7 @@ networks:
         default_contract_owner: false
 
 compiler:
-    evm_version: null
+    evm_version: istanbul
     solc:
         version: null
         optimizer:
